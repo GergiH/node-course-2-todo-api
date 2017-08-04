@@ -117,36 +117,21 @@ app.get('/users/me', authenticate, (req, res) => {
   res.send(req.user);
 });
 
+// POST /users/login {email, password}
+app.post('/users/login', (req, res) => {
+  var body = _.pick(req.body, ['email', 'password']);
+
+  User.findByCredentials(body.email, body.password).then((user) => {
+    return user.generateAuthToken().then((token) => {
+      res.header('x-auth', token).send(user);
+    });
+  }).catch((e) => {
+    res.status(400).send();
+  });
+});
+
 app.listen(port, () => {
   console.log(`Started up at port ${port}`);
 });
 
 module.exports = {app};
-
-// New Todo object and setting its properties
-// var otherTodo = new Todo({
-//   text: 'Feed the cat',
-//   completed: true,
-//   completedAt: 123
-// });
-
-// var otherTodo = new Todo({
-//   text: 'Something to do'
-// });
-
-// 'db.Savechanges()' then after return -> console.logs
-// otherTodo.save().then((doc) => {
-//   console.log(JSON.stringify(doc, undefined, 2));
-// }, (e) => {
-//   console.log('Unable to save', e);
-// })
-
-// var newUser = new User({
-//   email: 'rokalacs@gmail.com   '
-// });
-//
-// newUser.save().then((doc) => {
-//   console.log('User saved', doc);
-// }, (e) => {
-//   console.log('Unable to save user', e);
-// })
